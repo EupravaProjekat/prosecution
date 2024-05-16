@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"errors"
-	"github.com/MihajloJankovic/border-police/Repo"
+	"github.com/MihajloJankovic/prosecution/Repo"
 	protos "github.com/MihajloJankovic/profile-service/protos/main"
 	"github.com/gorilla/mux"
 	"log"

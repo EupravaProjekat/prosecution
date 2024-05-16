@@ -3,7 +3,7 @@ package Repo
 import (
 	"context"
 	"fmt"
-	"github.com/MihajloJankovic/border-police/Models"
+	"github.com/MihajloJankovic/prosecution/Models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

@@ -1,4 +1,4 @@
-module github.com/MihajloJankovic/border-police
+module github.com/EupravaProjekat/prosecution
 
 go 1.21.3
 
