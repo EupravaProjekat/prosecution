@@ -10,17 +10,17 @@ import (
 	"net/http"
 )
 
-type Borderhendler struct {
+type ProsecutionHandler struct {
 	l    *log.Logger
 	repo *Repo.Repo
 }
 
-func NewBorderhendler(l *log.Logger, r *Repo.Repo) *Borderhendler {
-	return &Borderhendler{l, r}
+func NewProsecutionHandler(l *log.Logger, r *Repo.Repo) *ProsecutionHandler {
+	return &ProsecutionHandler{l, r}
 
 }
 
-func (h *Borderhendler) CheckIfUserExists(w http.ResponseWriter, r *http.Request) {
+func (h *ProsecutionHandler) CheckIfUserExists(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
 	if err != nil {
@@ -52,7 +52,7 @@ func (h *Borderhendler) CheckIfUserExists(w http.ResponseWriter, r *http.Request
 
 }
 
-func (h *Borderhendler) GetProfile(w http.ResponseWriter, r *http.Request) {
+func (h *ProsecutionHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 
 	emaila := mux.Vars(r)["email"]
 	ee := new(protos.ProfileRequest)
@@ -93,7 +93,7 @@ func (h *Borderhendler) GetProfile(w http.ResponseWriter, r *http.Request) {
 	RenderJSON(w, response)
 }
 
-func (h *Borderhendler) NewRequest(w http.ResponseWriter, r *http.Request) {
+func (h *ProsecutionHandler) NewRequest(w http.ResponseWriter, r *http.Request) {
 
 	contentType := r.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
