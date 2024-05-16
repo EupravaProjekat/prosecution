@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/MihajloJankovic/border-police/Repo"
-	"github.com/MihajloJankovic/border-police/handlers"
+	"github.com/MihajloJankovic/prosecution/Repo"
+	"github.com/MihajloJankovic/prosecution/handlers"
 	habb "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"log"
