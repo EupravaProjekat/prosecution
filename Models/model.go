@@ -1,5 +1,15 @@
 package Models
 
+type BreachType int
+
+const (
+    BreachTypeUnknown BreachType = iota
+    BreachTypeSpeeding
+    BreachTypeParkingViolation
+    BreachTypeTrafficSignalViolation
+    // Add more breach types as needed
+)
+
 type User struct {
 	Email    string
 	Role     string
@@ -13,3 +23,9 @@ type Request struct {
 	CarPlateNumber string
 	Description    string
 }
+
+type Prosecution struct {
+	JMBG         string
+	TypeOfBreach BreachType
+}
+

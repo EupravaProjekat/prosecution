@@ -45,7 +45,8 @@ func main() {
 	router.HandleFunc("/newrequest", hh.NewRequest).Methods("POST")
 	router.HandleFunc("/checkifuserexists", hh.CheckIfUserExists).Methods("GET")
 
-	//router.HandlerFunc("/nestonesto", hh.nestonesto).Methods("GET")
+	router.HandleFunc("/check-if-person-is-prosecuted", hh.CheckIfPersonIsProsecuted).Methods("GET")
+	router.HandleFunc("/prosecute", hh.ProsecuteHandler).Methods("POST")
 
 	headersOk := habb.AllowedHeaders([]string{"Content-Type", "jwt", "Authorization"})
 	originsOk := habb.AllowedOrigins([]string{"http://localhost:4200"}) // Replace with your frontend origin
@@ -55,7 +56,7 @@ func main() {
 	corsRouter := habb.CORS(originsOk, headersOk, methodsOk)(router)
 
 	// Start the server
-	srv := &http.Server{Addr: ":9090", Handler: corsRouter}
+	srv := &http.Server{Addr: ":9199", Handler: corsRouter}
 	go func() {
 		log.Println("server starting")
 		if err := srv.ListenAndServe(); err != nil {

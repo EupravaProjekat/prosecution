@@ -3,11 +3,13 @@ package handlers
 import (
 	"errors"
 	"github.com/EupravaProjekat/prosecution/Repo"
+	"github.com/EupravaProjekat/prosecution/Models"
 	protos "github.com/MihajloJankovic/profile-service/protos/main"
 	"github.com/gorilla/mux"
 	"log"
 	"mime"
 	"net/http"
+	"encoding/json"
 )
 
 type ProsecutionHandler struct {
@@ -51,6 +53,100 @@ func (h *ProsecutionHandler) CheckIfUserExists(w http.ResponseWriter, r *http.Re
 	}
 
 }
+
+func (h *ProsecutionHandler) CheckIfPersonIsProsecuted(w http.ResponseWriter, r *http.Request) {
+    contentType := r.Header.Get("Content-Type")
+    mediatype, _, err := mime.ParseMediaType(contentType)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+    if mediatype != "application/json" {
+        err := errors.New("expect application/json Content-Type")
+        http.Error(w, err.Error(), http.StatusUnsupportedMediaType)
+        return
+    }
+
+    // Decode the request body
+    requestBody := struct {
+        JMBG string `json:"jmbg"`
+    }{}
+
+    if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    // Check if JMBG is empty
+    if requestBody.JMBG == "" {
+        err := errors.New("empty JMBG")
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    // Get prosecutions by JMBG
+    prosecutions, err := h.repo.GetProsecutionsByJmbg(requestBody.JMBG)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // Marshal prosecutions data to JSON
+    prosecutionsJSON, err := json.Marshal(prosecutions)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // Respond with prosecutions details
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    w.Write(prosecutionsJSON)
+}
+
+
+func (h *ProsecutionHandler) ProsecuteHandler(w http.ResponseWriter, r *http.Request) {
+    contentType := r.Header.Get("Content-Type")
+    mediatype, _, err := mime.ParseMediaType(contentType)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+    if mediatype != "application/json" {
+        err := errors.New("expect application/json Content-Type")
+        http.Error(w, err.Error(), http.StatusUnsupportedMediaType)
+        return
+    }
+
+    // Decode prosecution data from request body
+    prosecutionData, err := DecodeProsecutionBody(r.Body)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    // Create a new prosecution instance
+    prosecution := &Models.Prosecution{
+        JMBG:         prosecutionData.JMBG,
+        TypeOfBreach: prosecutionData.TypeOfBreach,
+    }
+
+    // Call CreateProsecution method from Repo
+    err = h.repo.CreateProsecution(prosecution)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // Respond with success
+    w.WriteHeader(http.StatusCreated)
+    w.Write([]byte("Prosecution created successfully"))
+}
+
+
+
+
+
 
 func (h *ProsecutionHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 

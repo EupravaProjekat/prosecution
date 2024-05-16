@@ -161,7 +161,58 @@ func (ar *Repo) DeleteByEmail(id string) error {
 }
 
 func (ar *Repo) getCollection() *mongo.Collection {
-	accommodationDatabase := ar.cli.Database("mongoBorder")
-	accommodationCollection := accommodationDatabase.Collection("border")
+	accommodationDatabase := ar.cli.Database("mongoProsecution")
+	accommodationCollection := accommodationDatabase.Collection("prosecution")
 	return accommodationCollection
 }
+
+func (ar *Repo) getCollectionForProsecution() *mongo.Collection {
+    return ar.cli.Database("mongoProsecution").Collection("prosecution")
+}
+
+
+func (ar *Repo) CreateProsecution(prosecution *Models.Prosecution) error {
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+    prosecutionCollection := ar.getCollectionForProsecution()
+    result, err := prosecutionCollection.InsertOne(ctx, prosecution)
+    if err != nil {
+        ar.logger.Println(err)
+        return err
+    }
+    ar.logger.Printf("Prosecution created with ID: %v\n", result.InsertedID)
+    return nil
+}
+
+func (ar *Repo) GetProsecutionsByJmbg(jmbg string) ([]*Models.Prosecution, error) {
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    prosecutionCollection := ar.getCollectionForProsecution()
+
+    filter := bson.M{"jmbg": jmbg}
+
+    cursor, err := prosecutionCollection.Find(ctx, filter)
+    if err != nil {
+        ar.logger.Println(err)
+        return nil, err
+    }
+    defer cursor.Close(ctx)
+
+    var prosecutions []*Models.Prosecution
+    for cursor.Next(ctx) {
+        var prosecution Models.Prosecution
+        if err := cursor.Decode(&prosecution); err != nil {
+            ar.logger.Println(err)
+            return nil, err
+        }
+        prosecutions = append(prosecutions, &prosecution)
+    }
+    if err := cursor.Err(); err != nil {
+        ar.logger.Println(err)
+        return nil, err
+    }
+
+    return prosecutions, nil
+}
+

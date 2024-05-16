@@ -238,3 +238,15 @@ func DecodeBodyPriceAndId(r io.Reader) (*protosava.PriceAndIdRequest, error) {
 	}
 	return &rt, nil
 }
+
+func DecodeProsecutionBody(r io.Reader) (*Models.Prosecution, error) {
+    dec := json.NewDecoder(r)
+    dec.DisallowUnknownFields()
+
+    var prosecution Models.Prosecution
+    if err := dec.Decode(&prosecution); err != nil {
+        return nil, err
+    }
+    return &prosecution, nil
+}
+
