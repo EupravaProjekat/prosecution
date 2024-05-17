@@ -45,7 +45,7 @@ func main() {
 	router.HandleFunc("/newrequest", hh.NewRequest).Methods("POST")
 	router.HandleFunc("/checkifuserexists", hh.CheckIfUserExists).Methods("GET")
 
-	router.HandleFunc("/check-if-person-is-prosecuted", hh.CheckIfPersonIsProsecuted).Methods("GET")
+	router.HandleFunc("/check-if-person-is-prosecuted", hh.CheckIfPersonIsProsecuted).Methods("POST")
 	router.HandleFunc("/prosecute", hh.ProsecuteHandler).Methods("POST")
 
 	headersOk := habb.AllowedHeaders([]string{"Content-Type", "jwt", "Authorization"})

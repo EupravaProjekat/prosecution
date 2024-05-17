@@ -53,55 +53,57 @@ func (h *ProsecutionHandler) CheckIfUserExists(w http.ResponseWriter, r *http.Re
 	}
 
 }
-
 func (h *ProsecutionHandler) CheckIfPersonIsProsecuted(w http.ResponseWriter, r *http.Request) {
-    contentType := r.Header.Get("Content-Type")
-    mediatype, _, err := mime.ParseMediaType(contentType)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
-    if mediatype != "application/json" {
-        err := errors.New("expect application/json Content-Type")
-        http.Error(w, err.Error(), http.StatusUnsupportedMediaType)
-        return
-    }
+	contentType := r.Header.Get("Content-Type")
+	mediatype, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if mediatype != "application/json" {
+		err := errors.New("expect application/json Content-Type")
+		http.Error(w, err.Error(), http.StatusUnsupportedMediaType)
+		return
+	}
 
-    // Decode the request body
-    requestBody := struct {
-        JMBG string `json:"jmbg"`
-    }{}
+	requestBody := struct {
+		JMBG string `json:"jmbg"`
+	}{}
 
-    if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
+	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-    // Check if JMBG is empty
-    if requestBody.JMBG == "" {
-        err := errors.New("empty JMBG")
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
+	if requestBody.JMBG == "" {
+		err := errors.New("empty JMBG")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-    // Get prosecutions by JMBG
-    prosecutions, err := h.repo.GetProsecutionsByJmbg(requestBody.JMBG)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+	prosecutions, err := h.repo.GetProsecutionsByJmbg(requestBody.JMBG)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    // Marshal prosecutions data to JSON
-    prosecutionsJSON, err := json.Marshal(prosecutions)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+	hasProsecutions := len(prosecutions) > 0
 
-    // Respond with prosecutions details
-    w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusOK)
-    w.Write(prosecutionsJSON)
+	response := struct {
+		Prosecuted bool `json:"prosecuted"`
+	}{
+		Prosecuted: hasProsecutions,
+	}
+
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseJSON)
 }
 
 
