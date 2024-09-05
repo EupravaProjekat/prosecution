@@ -49,7 +49,7 @@ func main() {
 	router.HandleFunc("/prosecute", hh.ProsecuteHandler).Methods("POST")
 
 	headersOk := habb.AllowedHeaders([]string{"Content-Type", "jwt", "Authorization"})
-	originsOk := habb.AllowedOrigins([]string{"http://localhost:4200"}) // Replace with your frontend origin
+	originsOk := habb.AllowedOrigins([]string{"*"}) // Replace with your frontend origin
 	methodsOk := habb.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 
 	// Use the CORS middleware
